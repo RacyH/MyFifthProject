@@ -2,7 +2,7 @@
 C++ Fall 2020
 Due: November 2nd
 Lab 5: Number Guessing Game
-: Write a number-guessing game in which the computer selects a random number in the range of 0 to 100,
+: Write a number-guessing game in which the computer selects a random number in the range of 1 to 100,
 and users get a maximum of 20 attempts to guess it.
 */
 
@@ -21,17 +21,19 @@ void failure();
 void again();
 void score(int& w, int& l);
 
-int main() /* A random note. I could have put every single part of this into a function, and called it something else, but this allowed for me to 
+int main() 
+{	
+	/* A random note. I could have put every single part of this into a function, and called it something else, but this allowed for me to 
 		   see more easily what was happening in my code, and edit it if need be.*/
-{
+
 	welcome(); //Welcome statement
 
-	int c = 1, s = 0, f = 0; /*Set the value of c to 1 so that the while statement would allow them to choose whether they wanted to play again or not. s and f are 0
-	so that the scores start, at the beginning of the game, as 0.*/
+	int c = 1, s = 0, f = 0; /*Set the value of c to 1 so that the while statement would allow the user to choose whether they wanted to play again or not. s and f are 0
+	so that the scores start, at the beginning of the game, as 0. s stands for success, f for fail, and that is why s is for wins, and f for losses.*/
 
 	while (c == 1)
 	{
-		game(s, f); //Used s and f here so that the scores would change throughout the game
+		game(s, f); //Used s and f here so that the scores would change throughout the game as the user plays through
 		again(); //The statement that asks if the player wants to play again.
 		cin >> c; //The input to change c to a number, which if it is not 1, will kick them from the game.
 	}
@@ -41,41 +43,43 @@ return 0;
 }
 
 void welcome()
-{ //Simple welcome to the game statements.
+{ //Simple welcome to the game statements, with warnings not to input characters at the risk of having one less guess.
 	cout << "Welcome to a number guessing game!\n" << "You have 20 guesses. The range of the number you are guessing is between 1 and 100.\n";
 	cout << "You will be able to restart the game once you have finished the 20 guesses, or you have guessed the correct number.\n";
 	cout << "Warning! Only input numbers.Incorrect inputs will count as a guess.\n";
-	cout << "Every game has a different number, so don't try counting up from 1, you only have 20 guesses per number.\n";
+	cout << "Every game has a different number, so don't try counting up from 1, you only have 20 guesses per random number.\n";
 }
 
-void game(int& w, int& l) //The w and l are there to keep score. I used the reference paramater so the score would keep as long as the code was open.
+void game(int& w, int& l) //The w and l are there to keep score. I used the reference paramater so the score would keep as long as the program was open.
 {
 	srand(time(NULL)); //Random seed generator
-	int x = rand() % 100 + 1, i = 0, ran; //Random number generator, range 1 to 100. The i keeps the number of guesses.
-	//cout << x; //For debugging purposes only. Will not show up in final output
+	int x = rand() % 100 + 1, i = 0, ran; //Random number generator, range 1 to 100. The i keeps the number of guesses. ran is the guess of the user.
+	
 	do
 	{
 		cout << "Your guess: ";
 		cin >> ran; //Input the number
-		cout << '\n';
+		cout << '\n'; //Makes sure that the cin, if it fails, will ignore the failed input, as in accordance with the if statement below.
+		
 		if (cin.fail()) //This checks to see if the input failed or not. If it did, then it will make this if statement operate.
-		{
+		{ //I put this if statement first, so that it would test for input failure before allowing the main part of this function to operate.
 			cin.clear(); /*This clears the cin so that you can continue the program without it failing. It also makes the first if statement not true, but technically
-it makes the second one true, so each wrong-input guess counts as a wrong answer.*/
-			cin.ignore(100, '\n'); // it will ignore 100 characters or get to the end of the line.
+it makes the second one true, so each wrong-input guess counts as a wrong answer. I actually wanted the code to perform this way, so that people would get a wrong answer output
+for their mistakes.*/
+			cin.ignore(100, '\n'); //This will have the code ignore 100 characters or get to the end of the line.
 		}
 			 if (ran == x) //Whenever you guess correctly, this if statement becomes true, and the following are done.
 			{
-				success();
+				success(); //Function call that holds the random correct guess statements
 				w++; //Keeps score of the times you won.
 			}
 			 else if (!(ran == x)) //Incorrect guesses.
 			{
-				failure();
+				failure(); //Function call that holds the random incorrect guess statements
 				i++; //Counts up for the number of guesses.
 				cout << "You have " << 20 - i << " guesses left.\n"; //Outputs guesses left
 			}
-		if (i == 20)
+		if (i == 20)//This is here so that it counts only complete game losses as losses for your final score.
 		{
 			l++; //Whenever you guess too many times, you get a loss tallied on to your score.
 		}
@@ -85,10 +89,11 @@ it makes the second one true, so each wrong-input guess counts as a wrong answer
 void success()
 {
 	srand(time(NULL));
-	int s = rand() % 10 + 1; //Another random number generator that makes it choose a number at random
-	switch (s) //With the help fo the random number generator, this switch statement allows for a random statement to be chosen.
+	int s = rand() % 10 + 1; //Another random number generator that makes it choose a number at random.
+	//I should note that this s here has higher precedence than the one used in the main function, because it is isolated from it by two other functions.
+	switch (s) //With the help of the random number generator, this switch statement allows for a random statement to be chosen.
 	{
-	case 1: //Whenever s == 1, this statement comes out.
+	case 1: //Whenever s == 1, this statement comes out. The rest follows the same pattern. 
 		cout << "You did it! Congratulations!\n\n";
 		break;
 	case 2:
@@ -123,7 +128,9 @@ void success()
 }
 
 void failure()
-{ //Practically the same reasoning and logic for this code, but allows for failure statements to be chosen at random.
+{ /*Practically the same reasoning and logic for this code, but allows for failure statements to be chosen at random.
+	Again, this f has precedence here over the f in the main function, because it is isolated, and it only has a scope inside of this function, which the other 
+	f has less precedence.*/
 	srand(time(NULL));
 	int f = rand() % 10 + 1;
 
@@ -208,5 +215,5 @@ void again()
 void score(int& w, int&l)
 { /*This is the code block that allows the score to be printed on the screen. I used the reference parameter so that the value of the integer would stay the same
 	throughout the code*/
-	cout << "You won " << w << " times.\n" << "You lost " << l << " times." << endl;
+	cout << "You won " << w << " times.\n" << "You lost " << l << " times, out of " << w + l << " games." << endl;
 }
